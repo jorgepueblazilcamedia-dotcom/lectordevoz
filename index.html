@@ -27,8 +27,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-      color: #0f172a;
+      background-color: #F3F3E7;
+      color: #2b0417;
     }
     
     .sentence-span {
@@ -38,13 +38,13 @@
       border-radius: 4px;
     }
     .sentence-active {
-      background-color: #dbeafe;
-      color: #1e40af;
-      font-weight: 600;
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+      background-color: #fce7f3;
+      color: #890149;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(137, 1, 73, 0.2);
     }
     .sentence-dimmed {
-      color: #94a3b8;
+      color: #a37c90;
       opacity: 0.6;
     }
 
@@ -54,29 +54,34 @@
       height: 18px;
       width: 18px;
       border-radius: 50%;
-      background: #2563eb;
+      background: #890149;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
+    .bg-cherry { background-color: #890149; }
+    .text-cherry { color: #890149; }
+    .border-cherry { border-color: #890149; }
+    .bg-alabaster { background-color: #F3F3E7; }
   </style>
 </head>
-<body class="min-h-screen pb-32">
+<body class="min-h-screen pb-32 bg-[#F3F3E7]">
 
   <!-- Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+  <header class="bg-white border-b border-pink-100 sticky top-0 z-30 shadow-sm">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#890149] to-pink-700 flex items-center justify-center text-white shadow-md shadow-pink-900/20">
           <i class="fa-solid fa-waveform-lines text-xl"></i>
         </div>
         <div>
-          <h1 class="font-bold text-lg text-slate-800 leading-tight">VozFlow MX</h1>
-          <p class="text-xs text-slate-500">Lector Inteligente con Voz Neural</p>
+          <h1 class="font-bold text-lg text-slate-900 leading-tight">VozFlow MX</h1>
+          <p class="text-xs text-pink-900 font-medium">Lector Inteligente con Voz Neural</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> Neural Voices MX
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-pink-50 text-[#890149] border border-pink-200">
+          <span class="w-2 h-2 rounded-full bg-[#890149] mr-1.5 animate-pulse"></span> Cherry & Alabaster
         </span>
       </div>
     </div>
@@ -85,18 +90,18 @@
   <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
 
     <!-- TAB SELECTOR -->
-    <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto">
+    <div class="bg-white p-1.5 rounded-2xl border border-pink-100 shadow-sm overflow-x-auto">
       <div class="flex space-x-1 min-w-max">
-        <button id="tab-doc" onclick="switchTab('doc')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all bg-blue-50 text-blue-700">
+        <button id="tab-doc" onclick="switchTab('doc')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all bg-pink-100 text-[#890149]">
           <i class="fa-solid fa-file-pdf"></i> Documentos y Libros
         </button>
-        <button id="tab-text" onclick="switchTab('text')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50">
+        <button id="tab-text" onclick="switchTab('text')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-pink-50">
           <i class="fa-solid fa-align-left"></i> Pegar Texto
         </button>
-        <button id="tab-url" onclick="switchTab('url')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50">
+        <button id="tab-url" onclick="switchTab('url')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-pink-50">
           <i class="fa-solid fa-link"></i> Artículo Web
         </button>
-        <button id="tab-ocr" onclick="switchTab('ocr')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50">
+        <button id="tab-ocr" onclick="switchTab('ocr')" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-pink-50">
           <i class="fa-solid fa-camera"></i> Escanear / Foto
         </button>
       </div>
@@ -105,31 +110,31 @@
     <!-- TAB CONTENTS -->
     
     <!-- 1. DOCUMENT UPLOADER TAB -->
-    <div id="content-doc" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-      <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-50/50" onclick="document.getElementById('doc-file-input').click()">
+    <div id="content-doc" class="tab-content bg-white p-6 rounded-2xl border border-pink-100 shadow-sm space-y-4">
+      <div class="border-2 border-dashed border-pink-200 rounded-xl p-6 text-center hover:border-[#890149] transition-colors cursor-pointer bg-[#F3F3E7]/40" onclick="document.getElementById('doc-file-input').click()">
         <input type="file" id="doc-file-input" class="hidden" accept=".pdf,.txt,.epub,.docx,.doc,.md" onchange="handleFileUpload(event)">
-        <i class="fa-solid fa-cloud-arrow-up text-4xl text-blue-500 mb-2"></i>
-        <p class="font-medium text-slate-700">Haz clic o arrastra aquí tu documento (PDF, EPUB, DOCX, DOC, TXT, MD)</p>
-        <p class="text-xs text-slate-400 mt-1">Sin límite de tamaño. Filtro automático de números de página.</p>
-        <p id="file-name" class="text-sm font-semibold text-blue-600 mt-2"></p>
+        <i class="fa-solid fa-cloud-arrow-up text-4xl text-[#890149] mb-2"></i>
+        <p class="font-medium text-slate-800">Haz clic o arrastra aquí tu documento (PDF, EPUB, DOCX, DOC, TXT, MD)</p>
+        <p class="text-xs text-slate-500 mt-1">Sin límite de tamaño. Filtro automático de números de página.</p>
+        <p id="file-name" class="text-sm font-semibold text-[#890149] mt-2"></p>
       </div>
 
       <!-- Page Range Selector -->
-      <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="bg-[#F3F3E7] p-4 rounded-xl border border-pink-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <span class="text-sm font-medium text-slate-700">Rango de Lectura:</span>
+          <span class="text-sm font-semibold text-slate-800">Rango de Lectura:</span>
           <span id="total-pages-label" class="text-xs text-slate-500 ml-2">(Sube un documento para seleccionar páginas)</span>
         </div>
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
-            <label for="page-from" class="text-xs text-slate-500">Desde:</label>
-            <input type="number" id="page-from" min="1" value="1" class="w-16 px-2 py-1 bg-white border border-slate-300 rounded-lg text-sm text-center">
+            <label for="page-from" class="text-xs text-slate-600">Desde:</label>
+            <input type="number" id="page-from" min="1" value="1" class="w-16 px-2 py-1 bg-white border border-pink-200 rounded-lg text-sm text-center">
           </div>
           <div class="flex items-center gap-2">
-            <label for="page-to" class="text-xs text-slate-500">Hasta:</label>
-            <input type="number" id="page-to" min="1" value="1" class="w-16 px-2 py-1 bg-white border border-slate-300 rounded-lg text-sm text-center">
+            <label for="page-to" class="text-xs text-slate-600">Hasta:</label>
+            <input type="number" id="page-to" min="1" value="1" class="w-16 px-2 py-1 bg-white border border-pink-200 rounded-lg text-sm text-center">
           </div>
-          <button onclick="extractDocumentText()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm">
+          <button onclick="extractDocumentText()" class="px-4 py-2 bg-[#890149] hover:bg-pink-900 text-white font-medium text-sm rounded-xl transition-all shadow-sm">
             <i class="fa-solid fa-play mr-1"></i> Cargar Rango Seleccionado
           </button>
         </div>
@@ -137,46 +142,46 @@
     </div>
 
     <!-- 2. TEXT PASTE TAB -->
-    <div id="content-text" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
-      <textarea id="raw-text-input" rows="6" class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-slate-700 placeholder-slate-400" placeholder="Pega aquí el texto sin importar su tamaño..."></textarea>
+    <div id="content-text" class="tab-content bg-white p-6 rounded-2xl border border-pink-100 shadow-sm space-y-4 hidden">
+      <textarea id="raw-text-input" rows="6" class="w-full p-4 border border-pink-200 rounded-xl focus:ring-2 focus:ring-[#890149] focus:border-transparent outline-none text-slate-800 placeholder-slate-400" placeholder="Pega aquí el texto sin importar su tamaño..."></textarea>
       <div class="flex justify-end">
-        <button onclick="loadRawText()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center gap-2">
+        <button onclick="loadRawText()" class="px-5 py-2.5 bg-[#890149] hover:bg-pink-900 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center gap-2">
           <i class="fa-solid fa-wand-magic-sparkles"></i> Analizar y Leer Texto
         </button>
       </div>
     </div>
 
     <!-- 3. ARTICLE URL TAB -->
-    <div id="content-url" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <div id="content-url" class="tab-content bg-white p-6 rounded-2xl border border-pink-100 shadow-sm space-y-4 hidden">
       <div class="flex flex-col sm:flex-row gap-3">
-        <input type="url" id="article-url-input" class="flex-1 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-700 text-sm" placeholder="https://ejemplo.com/articulo-de-noticias">
-        <button id="btn-fetch-url" onclick="fetchArticleText()" class="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+        <input type="url" id="article-url-input" class="flex-1 p-3 border border-pink-200 rounded-xl focus:ring-2 focus:ring-[#890149] outline-none text-slate-800 text-sm" placeholder="https://ejemplo.com/articulo-de-noticias">
+        <button id="btn-fetch-url" onclick="fetchArticleText()" class="px-5 py-3 bg-[#890149] hover:bg-pink-900 text-white font-medium text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
           <i class="fa-solid fa-magnifying-glass-arrow-right"></i> Extraer y Cargar Artículo
         </button>
       </div>
     </div>
 
     <!-- 4. OCR / IMAGE TAB -->
-    <div id="content-ocr" class="tab-content bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 hidden">
+    <div id="content-ocr" class="tab-content bg-white p-6 rounded-2xl border border-pink-100 shadow-sm space-y-4 hidden">
       <div class="flex flex-wrap gap-3">
-        <button onclick="document.getElementById('ocr-file-input').click()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all flex items-center gap-2">
+        <button onclick="document.getElementById('ocr-file-input').click()" class="px-4 py-2.5 bg-[#F3F3E7] hover:bg-pink-100 text-slate-800 font-medium text-sm rounded-xl transition-all flex items-center gap-2">
           <i class="fa-solid fa-image"></i> Subir Imagen
         </button>
         <input type="file" id="ocr-file-input" class="hidden" accept="image/*" onchange="handleOCRImage(event)">
         
-        <button onclick="startCamera()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all flex items-center gap-2">
+        <button onclick="startCamera()" class="px-4 py-2.5 bg-[#890149] hover:bg-pink-900 text-white font-medium text-sm rounded-xl transition-all flex items-center gap-2 shadow-sm">
           <i class="fa-solid fa-camera"></i> Tomar Foto
         </button>
       </div>
 
       <!-- Camera Preview -->
-      <div id="camera-container" class="relative hidden max-w-md mx-auto rounded-xl overflow-hidden border border-slate-200">
+      <div id="camera-container" class="relative hidden max-w-md mx-auto rounded-xl overflow-hidden border border-pink-200">
         <video id="webcam" autoplay playsinline muted class="w-full h-auto bg-black"></video>
         <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2 px-4">
-          <button onclick="capturePhoto()" class="px-4 py-2 bg-blue-600 text-white rounded-full font-medium text-xs shadow-lg flex items-center gap-1.5">
+          <button onclick="capturePhoto()" class="px-4 py-2 bg-[#890149] text-white rounded-full font-medium text-xs shadow-lg flex items-center gap-1.5">
             <i class="fa-solid fa-camera"></i> Capturar Foto
           </button>
-          <button onclick="stopCamera()" class="px-3 py-2 bg-slate-800/80 text-white rounded-full font-medium text-xs shadow-lg">
+          <button onclick="stopCamera()" class="px-3 py-2 bg-slate-900/80 text-white rounded-full font-medium text-xs shadow-lg">
             Cancelar
           </button>
         </div>
@@ -185,68 +190,68 @@
 
       <!-- Image Preview -->
       <div class="flex flex-col items-center gap-3">
-        <img id="ocr-preview" class="max-h-60 rounded-xl border border-slate-200 hidden shadow-sm" alt="Preview OCR">
-        <button id="btn-process-ocr" onclick="processOCRImage()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm hidden flex items-center gap-2">
+        <img id="ocr-preview" class="max-h-60 rounded-xl border border-pink-200 hidden shadow-sm" alt="Preview OCR">
+        <button id="btn-process-ocr" onclick="processOCRImage()" class="px-5 py-2.5 bg-[#890149] hover:bg-pink-900 text-white font-medium text-sm rounded-xl transition-all shadow-sm hidden flex items-center gap-2">
           <i class="fa-solid fa-wand-magic-sparkles"></i> Reconocer Texto de Imagen
         </button>
       </div>
     </div>
 
     <!-- VOICE SELECTOR (LOCUTORES MEXICANOS) -->
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-        <i class="fa-solid fa-user-group text-blue-500"></i> Selección de Locutor
+    <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
+      <h3 class="text-xs font-bold text-[#890149] uppercase tracking-wider mb-3 flex items-center gap-2">
+        <i class="fa-solid fa-user-group text-[#890149]"></i> Selección de Locutor
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
-        <label class="voice-card cursor-pointer p-4 rounded-xl border-2 border-blue-500 bg-blue-50/50 transition-all flex items-center justify-between">
+        <label class="voice-card cursor-pointer p-4 rounded-xl border-2 border-[#890149] bg-pink-50/60 transition-all flex items-center justify-between">
           <div>
-            <span class="font-bold text-base text-slate-800">Sofía (Mujer)</span>
-            <p class="text-xs text-slate-500 mt-0.5">Voz femenina, cálida y fluida</p>
+            <span class="font-bold text-base text-slate-900">Sofía (Mujer)</span>
+            <p class="text-xs text-slate-600 mt-0.5">Voz femenina, cálida y elegante</p>
           </div>
-          <input type="radio" name="voice" value="Kore" checked onchange="selectVoice(this)" class="w-4 h-4 accent-blue-600">
+          <input type="radio" name="voice" value="Kore" checked onchange="selectVoice(this)" class="w-4 h-4 accent-[#890149]">
         </label>
 
-        <label class="voice-card cursor-pointer p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all flex items-center justify-between">
+        <label class="voice-card cursor-pointer p-4 rounded-xl border border-pink-200 hover:border-[#890149] transition-all flex items-center justify-between bg-white">
           <div>
-            <span class="font-bold text-base text-slate-800">Mateo (Hombre)</span>
-            <p class="text-xs text-slate-500 mt-0.5">Voz masculina, grave y clara</p>
+            <span class="font-bold text-base text-slate-900">Mateo (Hombre)</span>
+            <p class="text-xs text-slate-600 mt-0.5">Voz masculina, grave y distinguida</p>
           </div>
-          <input type="radio" name="voice" value="Fenrir" onchange="selectVoice(this)" class="w-4 h-4 accent-blue-600">
+          <input type="radio" name="voice" value="Fenrir" onchange="selectVoice(this)" class="w-4 h-4 accent-[#890149]">
         </label>
 
       </div>
     </div>
 
     <!-- MAIN READER & SYNTHESIS DISPLAY -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+    <div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden flex flex-col">
       <!-- Reader Header Bar -->
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+      <div class="p-4 bg-[#F3F3E7]/60 border-b border-pink-100 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i class="fa-solid fa-book-open text-blue-600"></i>
-          <span id="reading-status" class="text-sm font-medium text-slate-700">Esperando texto...</span>
+          <i class="fa-solid fa-book-open text-[#890149]"></i>
+          <span id="reading-status" class="text-sm font-medium text-slate-800">Esperando texto...</span>
         </div>
         <div class="flex items-center gap-2">
-          <span id="analysis-status-badge" class="hidden text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+          <span id="analysis-status-badge" class="hidden text-xs px-2.5 py-1 rounded-full bg-pink-100 text-[#890149] border border-pink-200 font-medium">
             <i class="fa-solid fa-spinner animate-spin mr-1"></i> Analizando gramática
           </span>
-          <span id="word-count-badge" class="text-xs text-slate-400 font-medium">0 palabras</span>
+          <span id="word-count-badge" class="text-xs text-slate-500 font-medium">0 palabras</span>
         </div>
       </div>
 
-      <!-- Synthesis Progress Panel (YouTube Style) -->
-      <div id="synth-progress-container" class="hidden px-5 py-3 bg-blue-50/70 border-b border-blue-100 flex flex-col gap-1">
-        <div class="flex items-center justify-between text-xs font-semibold text-blue-900">
-          <span id="synth-status-text"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Sintetizando audio en orden secuencial...</span>
+      <!-- Synthesis Progress Panel (YouTube Style Dual Buffering) -->
+      <div id="synth-progress-container" class="hidden px-5 py-3 bg-pink-50 border-b border-pink-100 flex flex-col gap-1">
+        <div class="flex items-center justify-between text-xs font-semibold text-[#890149]">
+          <span id="synth-status-text"><i class="fa-solid fa-cloud-arrow-down mr-1"></i> Sintetizando audio en tiempo real...</span>
           <span id="synth-percentage-label">0%</span>
         </div>
-        <div class="w-full h-2 bg-blue-200 rounded-full overflow-hidden">
-          <div id="synth-progress-bar" class="h-full bg-blue-600 transition-all duration-300" style="width: 0%"></div>
+        <div class="w-full h-2 bg-pink-200 rounded-full overflow-hidden">
+          <div id="synth-progress-bar" class="h-full bg-[#890149] transition-all duration-300" style="width: 0%"></div>
         </div>
       </div>
 
       <!-- Interactive Reader Text Box -->
-      <div id="reader-view" class="p-6 text-slate-700 leading-relaxed text-base sm:text-lg max-h-[50vh] sm:max-h-[420px] overflow-y-auto space-y-2">
+      <div id="reader-view" class="p-6 text-slate-800 leading-relaxed text-base sm:text-lg max-h-[50vh] sm:max-h-[420px] overflow-y-auto space-y-2">
         <p class="text-slate-400 italic text-center py-8">Carga un documento o pega un texto arriba para comenzar la lectura sincronizada.</p>
       </div>
     </div>
@@ -254,21 +259,21 @@
   </main>
 
   <!-- BOTTOM FLOATING AUDIO CONTROLLER -->
-  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-2xl p-3 sm:p-4">
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-pink-100 shadow-2xl p-3 sm:p-4">
     <div class="max-w-4xl mx-auto space-y-2">
       
       <!-- Timeline Slider with Dual YouTube-style Buffering Bar -->
       <div class="flex items-center gap-3">
         <span id="current-time" class="text-xs font-semibold text-slate-500 w-10 text-right">00:00</span>
         <div class="relative flex-1 flex items-center">
-          <div class="absolute inset-0 h-1.5 bg-slate-200 rounded-full overflow-hidden pointer-events-none">
+          <div class="absolute inset-0 h-1.5 bg-pink-100 rounded-full overflow-hidden pointer-events-none">
             <!-- Buffering 35%-100% Bar -->
-            <div id="playback-buffer-bar" class="h-full bg-blue-200 transition-all" style="width: 0%"></div>
+            <div id="playback-buffer-bar" class="h-full bg-pink-300 transition-all" style="width: 0%"></div>
           </div>
           <input type="range" id="progress-slider" min="0" max="100" value="0" step="0.1" oninput="seekProgress(this.value)" class="relative z-10 w-full h-1.5 bg-transparent appearance-none cursor-pointer">
         </div>
         <span id="progress-percentage" class="text-xs font-semibold text-slate-500 w-10">0%</span>
-        <span id="synth-bar-badge" class="hidden sm:inline-flex text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">
+        <span id="synth-bar-badge" class="hidden sm:inline-flex text-[10px] bg-pink-100 text-[#890149] px-2 py-0.5 rounded-full font-bold">
           Sintetizado: <span id="synth-bar-percentage" class="ml-1">0%</span>
         </span>
       </div>
@@ -278,7 +283,7 @@
         
         <!-- Speed Selector -->
         <div class="flex items-center gap-1">
-          <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none">
+          <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-[#F3F3E7] border border-pink-200 text-[#890149] text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none">
             <option value="0.5">0.50X</option>
             <option value="0.75">0.75X</option>
             <option value="1.0" selected>1.0X</option>
@@ -288,23 +293,23 @@
             <option value="2.0">2.0X</option>
           </select>
 
-          <button id="btn-loop" onclick="toggleLoop()" title="Bucle" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-sm">
+          <button id="btn-loop" onclick="toggleLoop()" title="Bucle" class="p-2 text-slate-600 hover:bg-pink-50 rounded-lg transition-colors text-sm">
             <i class="fa-solid fa-repeat"></i>
           </button>
         </div>
 
         <!-- Main Buttons -->
         <div class="flex items-center gap-3">
-          <button onclick="skipSeconds(-10)" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all text-sm" title="Retroceder 10s">
+          <button onclick="skipSeconds(-10)" class="w-10 h-10 rounded-full bg-[#F3F3E7] hover:bg-pink-100 text-slate-700 flex items-center justify-center transition-all text-sm" title="Retroceder 10s">
             <i class="fa-solid fa-rotate-left"></i>
           </button>
 
-          <button id="btn-play-pause" onclick="togglePlayPause()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold rounded-full shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+          <button id="btn-play-pause" onclick="togglePlayPause()" class="px-6 py-2.5 bg-[#890149] hover:bg-pink-900 active:scale-95 text-white font-bold rounded-full shadow-lg shadow-pink-900/30 transition-all flex items-center gap-2">
             <i id="icon-play-pause" class="fa-solid fa-play text-lg"></i>
             <span id="label-play-pause" class="text-sm">Reproducir</span>
           </button>
 
-          <button onclick="skipSeconds(10)" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-all text-sm" title="Adelantar 10s">
+          <button onclick="skipSeconds(10)" class="w-10 h-10 rounded-full bg-[#F3F3E7] hover:bg-pink-100 text-slate-700 flex items-center justify-center transition-all text-sm" title="Adelantar 10s">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
         </div>
@@ -316,13 +321,10 @@
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast-msg" class="fixed top-20 right-4 z-50 bg-slate-800 text-white text-xs px-4 py-2.5 rounded-xl shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-2">
-    <i class="fa-solid fa-circle-info text-blue-400"></i>
+  <div id="toast-msg" class="fixed top-20 right-4 z-50 bg-slate-900 border border-slate-700 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-2">
+    <i class="fa-solid fa-circle-info text-sky-400"></i>
     <span id="toast-text">Mensaje</span>
   </div>
-
-  <!-- Hidden Audio Player element -->
-  <audio id="gemini-audio-player" class="hidden" onended="onAudioEnded()" ontimeupdate="syncWordsWithAudio()"></audio>
 
   <!-- APPLICATION LOGIC -->
   <script>
@@ -347,7 +349,7 @@
     let currentChunkPlayingIndex = -1;
     let currentSynthesisSession = 0; 
     
-    // Web Audio & Fallback Engine
+    // Web Audio Engine
     let audioCtx = null;
     let activeAudioSourceNode = null;
     let progressTimer = null;
@@ -355,30 +357,21 @@
 
     const voicePersonas = {
       'Kore': { name: 'Sofía', gender: 'female', lang: 'es-MX', pitch: 1.0 },
-      'Fenrir': { name: 'Mateo', gender: 'male', lang: 'es-MX', pitch: 0.85 }
+      'Fenrir': { name: 'Mateo', gender: 'male', lang: 'es-MX', pitch: 0.75 }
     };
 
-    function initApp() {
-      switchTab('doc');
-      updatePlayButtonUI();
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-    } else {
-      initApp();
-    }
-
-    function unlockAudioContext() {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) {
-          audioCtx = new AudioContextClass();
-        }
+    function selectVoice(elem) {
+      selectedVoice = elem.value;
+      document.querySelectorAll('.voice-card').forEach(card => {
+        card.classList.remove('border-2', 'border-[#890149]', 'bg-pink-50/60');
+        card.classList.add('border', 'border-pink-200', 'bg-white');
+      });
+      const parentLabel = elem.closest('.voice-card');
+      if (parentLabel) {
+        parentLabel.classList.remove('border', 'border-pink-200', 'bg-white');
+        parentLabel.classList.add('border-2', 'border-[#890149]', 'bg-pink-50/60');
       }
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
+      showToast(`Locutor cambiado a ${voicePersonas[selectedVoice].name}`);
     }
 
     function switchTab(tabId) {
@@ -386,7 +379,7 @@
         stopCamera();
       }
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-50', 'text-blue-700');
+        btn.classList.remove('bg-pink-100', 'text-[#890149]', 'font-semibold');
         btn.classList.add('text-slate-600');
       });
       document.querySelectorAll('.tab-content').forEach(content => {
@@ -397,12 +390,12 @@
       const activeContent = document.getElementById(`content-${tabId}`);
 
       if (activeBtn && activeContent) {
-        activeBtn.classList.add('bg-blue-50', 'text-blue-700');
+        activeBtn.classList.add('bg-pink-100', 'text-[#890149]', 'font-semibold');
         activeBtn.classList.remove('text-slate-600');
         activeContent.classList.remove('hidden');
       }
     }
-    // --- CAMERA & OCR FUNCTIONS ---
+
     async function startCamera() {
       const cameraContainer = document.getElementById('camera-container');
       const webcam = document.getElementById('webcam');
@@ -410,13 +403,10 @@
       stopCamera();
 
       try {
-        let constraints = { video: { facingMode: { exact: "environment" } } };
-        try {
-          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (e) {
-          constraints = { video: { facingMode: "user" } };
-          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-        }
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false
+        });
 
         webcam.srcObject = cameraStream;
         webcam.setAttribute("playsinline", true);
@@ -429,6 +419,33 @@
       } catch (err) {
         console.error("Error al acceder a la cámara:", err);
         showToast("No se pudo acceder a la cámara. Revisa los permisos.");
+      }
+    }
+
+    // --- CAMERA & OCR FIX (SINGLE CLICK) ---
+    async function startCamera() {
+      const cameraContainer = document.getElementById('camera-container');
+      const webcam = document.getElementById('webcam');
+      
+      if (cameraStream) {
+        stopCamera();
+      }
+
+      try {
+        let constraints = { video: { facingMode: { ideal: "environment" } } };
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        webcam.srcObject = cameraStream;
+        webcam.setAttribute("playsinline", "true");
+        webcam.setAttribute("autoplay", "true");
+        webcam.setAttribute("muted", "true");
+
+        cameraContainer.classList.remove('hidden');
+        await webcam.play();
+        showToast("Cámara iniciada.");
+      } catch (err) {
+        console.error("Error al acceder a la cámara:", err);
+        showToast("Permiso de cámara denegado o no disponible.");
       }
     }
 
@@ -890,16 +907,22 @@
         activeUtterance.rate = playbackSpeed;
         activeUtterance.lang = 'es-MX';
         
-        // Apply distinct pitch to ensure noticeable difference between male and female tones
         const persona = voicePersonas[selectedVoice];
         activeUtterance.pitch = persona.pitch || 1.0;
 
         const voices = window.speechSynthesis.getVoices();
         const targetGender = persona.gender;
-        const selectedVoiceObj = voices.find(v => 
-          v.lang.startsWith('es') && 
-          (targetGender === 'female' ? /female|sofia|monica|helena|paulina/i.test(v.name) : /male|jorge|pablo|diego|carlos|raúl|raul|puck|fenrir/i.test(v.name))
-        ) || voices.find(v => v.lang.startsWith('es'));
+        
+        // Strict male/female voice matcher for Mateo vs Sofia
+        const selectedVoiceObj = voices.find(v => {
+          const name = v.name.toLowerCase();
+          if (!v.lang.startsWith('es')) return false;
+          if (targetGender === 'male') {
+            return name.includes('male') || name.includes('jorge') || name.includes('pablo') || name.includes('diego') || name.includes('carlos') || name.includes('raul') || name.includes('puck') || name.includes('fenrir');
+          } else {
+            return name.includes('female') || name.includes('sofia') || name.includes('monica') || name.includes('helena') || name.includes('paulina') || name.includes('kore');
+          }
+        }) || voices.find(v => v.lang.startsWith('es'));
 
         if (selectedVoiceObj) {
           activeUtterance.voice = selectedVoiceObj;
