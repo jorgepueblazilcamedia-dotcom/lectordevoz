@@ -360,28 +360,67 @@
       'Fenrir': { name: 'Mateo', gender: 'male', lang: 'es-MX', pitch: 0.75 }
     };
 
+    // --- CONVERTIDOR PCM DE 16-BIT A BLOB WAV ESTÁNDAR PARA NAVEGADORES MÓVILES ---
+    function pcmToWav(pcmData, sampleRate) {
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+      const blockAlign = (numChannels * bitsPerSample) / 8;
+      const dataSize = pcmData.length * 2;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+
+      /* Contenedor RIFF */
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(view, 8, 'WAVE');
+      /* Formato sub-chunk */
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true); // Tamaño del sub-chunk
+      view.setUint16(20, 1, true);  // PCM Lineal
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      /* Sub-chunk de datos */
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      // Copiar muestras de PCM de 16-bit
+      let offset = 44;
+      for (let i = 0; i < pcmData.length; i++, offset += 2) {
+        view.setInt16(offset, pcmData[i], true);
+      }
+
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    function writeString(view, offset, string) {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    }
+
     // --- MOBILE AUDIO UNLOCKER ENGINE ---
     function unlockAudioContext() {
       if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (AudioContextClass) {
-          audioCtx = new AudioContextClass({ sampleRate: 24000 });
+          audioCtx = new AudioContextClass();
         }
       }
       if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
-      // Play an instant silent buffer to grant browser mobile media permissions
       if (audioCtx) {
         try {
-          const silentBuffer = audioCtx.createBuffer(1, 1, 24000);
+          const silentBuffer = audioCtx.createBuffer(1, 1, 22050);
           const source = audioCtx.createBufferSource();
           source.buffer = silentBuffer;
           source.connect(audioCtx.destination);
           source.start(0);
-        } catch (e) {
-          console.warn("Error enviando buffer de silencio:", e);
-        }
+        } catch (e) {}
       }
     }
 
@@ -813,10 +852,13 @@
                   pcmData[k] = binaryStr.charCodeAt(k * 2) | (binaryStr.charCodeAt(k * 2 + 1) << 8);
                 }
 
+                // Generar Blob WAV optimizado para móviles
+                const wavBlob = pcmToWav(pcmData, sampleRate);
+                const wavArrayBuffer = await wavBlob.arrayBuffer();
+
                 audioChunks[i] = { 
                   index: i, 
-                  pcmData: pcmData,
-                  sampleRate: sampleRate,
+                  arrayBuffer: wavArrayBuffer,
                   duration: pcmData.length / sampleRate
                 };
               }
@@ -891,37 +933,37 @@
       const chunk = audioChunks[index];
       unlockAudioContext();
 
-      // Priority 1: High-Fidelity AudioContext Native Buffer Output
-      if (chunk && chunk.pcmData && audioCtx) {
-        try {
-          const audioBuffer = audioCtx.createBuffer(1, chunk.pcmData.length, chunk.sampleRate || 24000);
-          const channelData = audioBuffer.getChannelData(0);
-          for (let i = 0; i < chunk.pcmData.length; i++) {
-            channelData[i] = chunk.pcmData[i] / 32768.0;
+      // Prioridad 1: Decodificación WAV nativa por hardware en AudioContext para Móviles
+      if (chunk && chunk.arrayBuffer && audioCtx) {
+        audioCtx.decodeAudioData(chunk.arrayBuffer.slice(0), (audioBuffer) => {
+          try {
+            activeAudioSourceNode = audioCtx.createBufferSource();
+            activeAudioSourceNode.buffer = audioBuffer;
+            activeAudioSourceNode.playbackRate.value = playbackSpeed;
+            activeAudioSourceNode.connect(audioCtx.destination);
+
+            activeAudioSourceNode.onended = () => {
+              if (isPlaying) {
+                playChunkIndex(currentChunkPlayingIndex + 1);
+              }
+            };
+
+            activeAudioSourceNode.start(0);
+            isPlaying = true;
+            startProgressTimer(chunk.duration / playbackSpeed);
+            updatePlayButtonUI();
+          } catch (e) {
+            console.warn("Error en reproducción AudioContext, recurriendo a respaldo...", e);
+            playWebSpeechFallback(index);
           }
-
-          activeAudioSourceNode = audioCtx.createBufferSource();
-          activeAudioSourceNode.buffer = audioBuffer;
-          activeAudioSourceNode.playbackRate.value = playbackSpeed;
-          activeAudioSourceNode.connect(audioCtx.destination);
-
-          activeAudioSourceNode.onended = () => {
-            if (isPlaying) {
-              playChunkIndex(currentChunkPlayingIndex + 1);
-            }
-          };
-
-          activeAudioSourceNode.start(0);
-          isPlaying = true;
-          startProgressTimer(chunk.duration / playbackSpeed);
-          updatePlayButtonUI();
-          return;
-        } catch (e) {
-          console.warn("Buffer AudioContext error, activando respaldo local...", e);
-        }
+        }, (err) => {
+          console.warn("Error decodificando WAV nativo:", err);
+          playWebSpeechFallback(index);
+        });
+        return;
       }
 
-      // Priority 2: Reliable Local Web Speech Synthesis Fallback (Guarantees Mobile Audio)
+      // Prioridad 2: Resguardo Web Speech Synthesis
       playWebSpeechFallback(index);
     }
 
