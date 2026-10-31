@@ -873,18 +873,28 @@
       if (isPlaying) {
         pausePlayback();
       } else {
-        if (currentChunkPlayingIndex < 0) {
+        // En móviles, si no se ha iniciado la reproducción (index < 0), forzar siempre el enunciado 0
+        if (currentChunkPlayingIndex < 0 || currentChunkPlayingIndex >= sentences.length) {
           playChunkIndex(0);
         } else {
-          player.play();
-          isPlaying = true;
-          updatePlayButtonUI();
+          player.play().then(() => {
+            isPlaying = true;
+            updatePlayButtonUI();
+          }).catch(err => {
+            console.error("Error reanudando audio en móvil:", err);
+            // Si el reproductor pierde la referencia en móvil, reintentar desde el chunk actual
+            playChunkIndex(currentChunkPlayingIndex);
+          });
         }
       }
     }
 
     function playChunkIndex(index) {
-      if (index >= sentences.length) {
+      // Asegurar que el índice no sea negativo
+      if (index < 0) index = 0;
+
+      // Solo dar por terminada la lectura si realmente rebasó el total de enunciados
+      if (sentences.length > 0 && index >= sentences.length) {
         if (isLooping) {
           playChunkIndex(0);
         } else {
@@ -908,11 +918,11 @@
           updatePlayButtonUI();
         }).catch(err => {
           console.error("Audio playback error:", err);
-          // Si falla al reproducir este fragmento específico, intentar avanzar al siguiente
-          setTimeout(() => playChunkIndex(index + 1), 500);
+          // Si falla al reproducir este fragmento específico en móvil, intentar avanzar al siguiente
+          setTimeout(() => playChunkIndex(index + 1), 300);
         });
       } else {
-        // Si el proceso de síntesis completo terminó (o este índice falló), saltar al siguiente enunciado en lugar de atascarse
+        // Si el proceso de síntesis completo terminó (o este índice falló/no devolvió audio), saltar al siguiente enunciado en lugar de atascarse
         if (!isSynthesizing || synthesizedChunksCount >= totalChunksCount) {
           console.warn(`Fragmento ${index} no disponible tras síntesis. Avanzando al siguiente...`);
           playChunkIndex(index + 1);
