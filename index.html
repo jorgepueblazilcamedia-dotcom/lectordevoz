@@ -836,7 +836,11 @@
         return;
       }
 
+      // DESBLOQUEO SÍNCRONO PARA NAVEGADORES MÓVILES (iOS Safari / Android Chrome)
       const ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+      }
 
       if (isPlaying) {
         pausePlayback();
@@ -869,8 +873,11 @@
 
       const chunk = audioChunks[index];
       const ctx = getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+      }
 
-      // Desbloqueo y reproducción nativa en AudioContext de Alta Fidelidad (24kHz Neural Audio)
+      // Reproducción nativa en AudioContext de Alta Fidelidad (24kHz Neural Audio)
       if (chunk && chunk.pcmData && ctx) {
         try {
           const audioBuffer = ctx.createBuffer(1, chunk.pcmData.length, chunk.sampleRate || 24000);
