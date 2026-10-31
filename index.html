@@ -908,11 +908,19 @@
           updatePlayButtonUI();
         }).catch(err => {
           console.error("Audio playback error:", err);
-          setTimeout(() => playChunkIndex(index + 1), 1000);
+          // Si falla al reproducir este fragmento específico, intentar avanzar al siguiente
+          setTimeout(() => playChunkIndex(index + 1), 500);
         });
       } else {
-        showToast(`Cargando voz para el enunciado ${index + 1}...`);
-        setTimeout(() => playChunkIndex(index), 800);
+        // Si el proceso de síntesis completo terminó (o este índice falló), saltar al siguiente enunciado en lugar de atascarse
+        if (!isSynthesizing || synthesizedChunksCount >= totalChunksCount) {
+          console.warn(`Fragmento ${index} no disponible tras síntesis. Avanzando al siguiente...`);
+          playChunkIndex(index + 1);
+        } else {
+          // Si aún se está sintetizando en segundo plano, esperar reintento corto
+          showToast(`Cargando voz para el enunciado ${index + 1}...`);
+          setTimeout(() => playChunkIndex(index), 600);
+        }
       }
     }
 
@@ -930,146 +938,147 @@
       isPlaying = false;
       currentChunkPlayingIndex = -1;
       updatePlayButtonUI();
+      
+      document.querySelectorAll('.sentence-span').forEach(span => {
+        span.classList.remove('sentence-active', 'sentence-dimmed');
+      });
     }
 
     function updatePlayButtonUI() {
       const icon = document.getElementById('icon-play-pause');
       const label = document.getElementById('label-play-pause');
-
       if (isPlaying) {
-        icon.className = 'fa-solid fa-pause text-xl';
+        icon.className = 'fa-solid fa-pause text-lg sm:text-xl';
         label.innerText = 'Pausar';
       } else {
-        icon.className = 'fa-solid fa-play text-xl';
+        icon.className = 'fa-solid fa-play text-lg sm:text-xl';
         label.innerText = 'Reproducir';
       }
     }
 
     function highlightSentence(index) {
-      currentSentenceIndex = index;
-      const allSpans = document.querySelectorAll('.sentence-span');
-
-      allSpans.forEach((span, idx) => {
-        if (idx === index) {
-          span.className = 'sentence-span sentence-active';
-          span.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if (idx < index) {
-          span.className = 'sentence-span sentence-dimmed';
+      document.querySelectorAll('.sentence-span').forEach((span, idx) => {
+        span.classList.remove('sentence-active');
+        if (idx < index) {
+          span.classList.add('sentence-dimmed');
+        } else if (idx === index) {
+          span.classList.remove('sentence-dimmed');
+          span.classList.add('sentence-active');
+          span.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
-          span.className = 'sentence-span';
+          span.classList.remove('sentence-dimmed');
         }
       });
-
-      if (sentences.length > 0) {
-        const progress = Math.round(((index + 1) / sentences.length) * 100);
-        document.getElementById('progress-percentage').innerText = `${progress}%`;
-        document.getElementById('progress-slider').value = progress;
-      }
     }
 
     function syncWordsWithAudio() {
       const player = document.getElementById('gemini-audio-player');
-      if (player.duration) {
-        const chunk = audioChunks[currentChunkPlayingIndex];
-        if (chunk) {
-          const formattedCurrent = formatTime(player.currentTime);
-          document.getElementById('current-time').innerText = formattedCurrent;
-        }
-      }
+      if (!player.duration || player.duration === 0) return;
+
+      const progress = (player.currentTime / player.duration);
+      const overallProgress = ((currentChunkPlayingIndex + progress) / sentences.length) * 100;
+      
+      document.getElementById('progress-slider').value = overallProgress;
+      document.getElementById('progress-percentage').innerText = `${Math.round(overallProgress)}%`;
+
+      const mins = Math.floor(player.currentTime / 60).toString().padStart(2, '0');
+      const secs = Math.floor(player.currentTime % 60).toString().padStart(2, '0');
+      document.getElementById('current-time').innerText = `${mins}:${secs}`;
     }
 
     function onAudioEnded() {
-      playChunkIndex(currentChunkPlayingIndex + 1);
+      if (currentChunkPlayingIndex >= 0) {
+        playChunkIndex(currentChunkPlayingIndex + 1);
+      }
     }
 
     function seekProgress(val) {
       if (sentences.length === 0) return;
-      const targetIndex = Math.floor((val / 100) * sentences.length);
-      const safeIndex = Math.min(Math.max(0, targetIndex), sentences.length - 1);
-      playChunkIndex(safeIndex);
+      const targetSentenceIndex = Math.min(
+        Math.floor((val / 100) * sentences.length),
+        sentences.length - 1
+      );
+      playChunkIndex(targetSentenceIndex);
     }
 
-    function changeSpeed(speedVal) {
-      playbackSpeed = parseFloat(speedVal);
+    function changeSpeed(val) {
+      playbackSpeed = parseFloat(val);
       const player = document.getElementById('gemini-audio-player');
       player.playbackRate = playbackSpeed;
-      showToast(`Velocidad ajustada a: ${speedVal}X`);
     }
 
     function toggleLoop() {
       isLooping = !isLooping;
       const btn = document.getElementById('btn-loop');
       if (isLooping) {
+        btn.classList.remove('bg-slate-100', 'text-slate-600');
         btn.classList.add('bg-blue-100', 'text-blue-700');
-        showToast("Bucle activado.");
+        showToast("Repetición en bucle activada.");
       } else {
         btn.classList.remove('bg-blue-100', 'text-blue-700');
-        showToast("Bucle desactivado.");
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+        showToast("Repetición en bucle desactivada.");
       }
     }
 
-    function skipSeconds(sec) {
-      if (sentences.length === 0) return;
-      if (sec < 0) {
-        const prevIndex = Math.max(0, currentChunkPlayingIndex - 1);
-        playChunkIndex(prevIndex);
+    function skipSeconds(seconds) {
+      const player = document.getElementById('gemini-audio-player');
+      if (!player.src || currentChunkPlayingIndex < 0) return;
+
+      let newTime = player.currentTime + seconds;
+      if (newTime < 0) {
+        if (currentChunkPlayingIndex > 0) {
+          playChunkIndex(currentChunkPlayingIndex - 1);
+        } else {
+          player.currentTime = 0;
+        }
+      } else if (newTime > player.duration) {
+        playChunkIndex(currentChunkPlayingIndex + 1);
       } else {
-        const nextIndex = Math.min(sentences.length - 1, currentChunkPlayingIndex + 1);
-        playChunkIndex(nextIndex);
+        player.currentTime = newTime;
       }
     }
 
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    // Convert raw PCM linear 16 data to WAV Blob
-    function createWavBlob(pcmData, sampleRate) {
-      const buffer = new ArrayBuffer(44 + pcmData.length * 2);
+    // Helper Utility: Convert Int16 PCM array to playable WAV Blob
+    function createWavBlob(pcmData, sampleRate = 24000) {
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+      const blockAlign = (numChannels * bitsPerSample) / 8;
+      const dataSize = pcmData.length * 2;
+      const buffer = new ArrayBuffer(44 + dataSize);
       const view = new DataView(buffer);
 
-      /* RIFF identifier */
-      writeString(view, 0, 'RIFF');
-      /* RIFF chunk length */
-      view.setUint32(4, 36 + pcmData.length * 2, true);
-      /* RIFF type */
-      writeString(view, 8, 'WAVE');
-      /* format chunk identifier */
-      writeString(view, 12, 'fmt ');
-      /* format chunk length */
-      view.setUint32(16, 16, true);
-      /* sample format (raw PCM) */
-      view.setUint16(20, 1, true);
-      /* channel count (mono) */
-      view.setUint16(22, 1, true);
-      /* sample rate */
-      view.setUint32(24, sampleRate, true);
-      /* byte rate (sample rate * block align) */
-      view.setUint32(28, sampleRate * 2, true);
-      /* block align (channel count * bytes per sample) */
-      view.setUint16(32, 2, true);
-      /* bits per sample */
-      view.setUint16(34, 16, true);
-      /* data chunk identifier */
-      writeString(view, 36, 'data');
-      /* data chunk length */
-      view.setUint32(40, pcmData.length * 2, true);
+      function writeString(offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
 
-      /* write PCM samples */
+      /* RIFF header */
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(8, 'WAVE');
+      /* fmt chunk */
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+      view.setUint16(20, 1, true);  // AudioFormat (1 for PCM)
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      /* data chunk */
+      writeString(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      // Write PCM audio samples
       let offset = 44;
       for (let i = 0; i < pcmData.length; i++, offset += 2) {
         view.setInt16(offset, pcmData[i], true);
       }
 
       return new Blob([buffer], { type: 'audio/wav' });
-    }
-
-    function writeString(view, offset, string) {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
     }
   </script>
 </body>
