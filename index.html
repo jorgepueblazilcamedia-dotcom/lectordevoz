@@ -870,9 +870,10 @@
       const chunk = audioChunks[index];
       const ctx = getAudioContext();
 
+      // Desbloqueo y reproducción nativa en AudioContext de Alta Fidelidad (24kHz Neural Audio)
       if (chunk && chunk.pcmData && ctx) {
         try {
-          const audioBuffer = ctx.createBuffer(1, chunk.pcmData.length, chunk.sampleRate);
+          const audioBuffer = ctx.createBuffer(1, chunk.pcmData.length, chunk.sampleRate || 24000);
           const channelData = audioBuffer.getChannelData(0);
           for (let i = 0; i < chunk.pcmData.length; i++) {
             channelData[i] = chunk.pcmData[i] / 32768.0;
@@ -895,58 +896,26 @@
           updatePlayButtonUI();
           return;
         } catch (e) {
-          console.warn("Web Audio Buffer fallback to HTML5/WebSpeech:", e);
+          console.warn("Error reproduciendo buffer neural:", e);
         }
       }
 
-      if (chunk && chunk.url) {
-        const player = document.getElementById('gemini-audio-player');
-        player.src = chunk.url;
-        player.playbackRate = playbackSpeed;
-        player.play().then(() => {
-          isPlaying = true;
-          updatePlayButtonUI();
-        }).catch(err => {
-          console.error("HTML5 Audio blocked, engaging SpeechSynthesis fallback:", err);
-          playWebSpeechFallback(index);
-        });
-        return;
+      // Si el fragmento aún no ha terminado de sintetizarse, esperar brevemente al motor neural
+      if (!isSynthesizing || synthesizedChunksCount >= totalChunksCount) {
+        if (index < sentences.length - 1) {
+          playChunkIndex(index + 1);
+        } else {
+          stopPlayback();
+        }
+      } else {
+        showToast(`Cargando voz neural para el enunciado ${index + 1}...`);
+        setTimeout(() => playChunkIndex(index), 500);
       }
-
-      playWebSpeechFallback(index);
     }
 
     function playWebSpeechFallback(index) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const textToRead = sentences[index];
-        speechUtterance = new SpeechSynthesisUtterance(textToRead);
-        speechUtterance.lang = voicePersonas[selectedVoice]?.lang || 'es-MX';
-        speechUtterance.rate = playbackSpeed;
-
-        speechUtterance.onend = () => {
-          if (isPlaying) {
-            playChunkIndex(index + 1);
-          }
-        };
-
-        speechUtterance.onerror = () => {
-          if (isPlaying) {
-            playChunkIndex(index + 1);
-          }
-        };
-
-        isPlaying = true;
-        updatePlayButtonUI();
-        window.speechSynthesis.speak(speechUtterance);
-      } else {
-        if (!isSynthesizing || synthesizedChunksCount >= totalChunksCount) {
-          playChunkIndex(index + 1);
-        } else {
-          showToast(`Sintetizando enunciado ${index + 1}...`);
-          setTimeout(() => playChunkIndex(index), 600);
-        }
-      }
+      // Función desactivada para garantizar que NUNCA se utilice voz robótica local.
+      // Toda la lectura se procesa mediante voces neurales humanas de alta calidad de la API.
     }
 
     function stopActiveAudioNodes() {
@@ -956,9 +925,6 @@
           activeAudioSourceNode.disconnect();
         } catch (e) {}
         activeAudioSourceNode = null;
-      }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
       }
       if (progressTimer) {
         clearInterval(progressTimer);
