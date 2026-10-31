@@ -873,27 +873,39 @@
       if (isPlaying) {
         pausePlayback();
       } else {
-        // En móviles, si no se ha iniciado la reproducción (index < 0), forzar siempre el enunciado 0
+        // En móviles, desbloquear inmediatamente el elemento de audio en la interacción táctil
+        player.play().catch(() => {}); // Intento de desbloqueo síncrono
+
+        // Si es el inicio o estamos al final, forzar el inicio explícito en el primer enunciado
         if (currentChunkPlayingIndex < 0 || currentChunkPlayingIndex >= sentences.length) {
           playChunkIndex(0);
         } else {
-          player.play().then(() => {
-            isPlaying = true;
-            updatePlayButtonUI();
-          }).catch(err => {
-            console.error("Error reanudando audio en móvil:", err);
-            // Si el reproductor pierde la referencia en móvil, reintentar desde el chunk actual
+          // Reanudar la reproducción del enunciado actual
+          const currentChunk = audioChunks[currentChunkPlayingIndex];
+          if (currentChunk && currentChunk.url) {
+            if (player.src !== currentChunk.url) {
+              player.src = currentChunk.url;
+            }
+            player.playbackRate = playbackSpeed;
+            player.play().then(() => {
+              isPlaying = true;
+              updatePlayButtonUI();
+            }).catch(err => {
+              console.error("Error al reanudar audio en móvil:", err);
+              playChunkIndex(currentChunkPlayingIndex);
+            });
+          } else {
             playChunkIndex(currentChunkPlayingIndex);
-          });
+          }
         }
       }
     }
 
     function playChunkIndex(index) {
-      // Asegurar que el índice no sea negativo
+      // Asegurar que el índice esté dentro de los límites válidos
       if (index < 0) index = 0;
 
-      // Solo dar por terminada la lectura si realmente rebasó el total de enunciados
+      // Evaluar la finalización solo cuando hay oraciones válidas y superamos la última
       if (sentences.length > 0 && index >= sentences.length) {
         if (isLooping) {
           playChunkIndex(0);
@@ -913,23 +925,36 @@
       if (chunk && chunk.url) {
         player.src = chunk.url;
         player.playbackRate = playbackSpeed;
-        player.play().then(() => {
-          isPlaying = true;
-          updatePlayButtonUI();
-        }).catch(err => {
-          console.error("Audio playback error:", err);
-          // Si falla al reproducir este fragmento específico en móvil, intentar avanzar al siguiente
-          setTimeout(() => playChunkIndex(index + 1), 300);
-        });
+        
+        // La llamada a play() se ejecuta directamente
+        const playPromise = player.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            isPlaying = true;
+            updatePlayButtonUI();
+          }).catch(err => {
+            console.error(`Error al reproducir el fragmento ${index} en móvil:`, err);
+            // Si el navegador móvil bloquea la URL o hay micro-retraso de renderizado, reintentar brevemente
+            setTimeout(() => {
+              player.play().then(() => {
+                isPlaying = true;
+                updatePlayButtonUI();
+              }).catch(() => {
+                // Si falla de forma persistente este fragmento en particular, intentar avanzar al siguiente
+                playChunkIndex(index + 1);
+              });
+            }, 150);
+          });
+        }
       } else {
-        // Si el proceso de síntesis completo terminó (o este índice falló/no devolvió audio), saltar al siguiente enunciado en lugar de atascarse
+        // Si la síntesis terminó o el fragmento no tiene audio, avanzar automáticamente al siguiente
         if (!isSynthesizing || synthesizedChunksCount >= totalChunksCount) {
-          console.warn(`Fragmento ${index} no disponible tras síntesis. Avanzando al siguiente...`);
+          console.warn(`Fragmento ${index} no disponible. Avanzando al siguiente...`);
           playChunkIndex(index + 1);
         } else {
-          // Si aún se está sintetizando en segundo plano, esperar reintento corto
-          showToast(`Cargando voz para el enunciado ${index + 1}...`);
-          setTimeout(() => playChunkIndex(index), 600);
+          // Si aún se está procesando en segundo plano
+          showToast(`Sintetizando enunciado ${index + 1}...`);
+          setTimeout(() => playChunkIndex(index), 500);
         }
       }
     }
